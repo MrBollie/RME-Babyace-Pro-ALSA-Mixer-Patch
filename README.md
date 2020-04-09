@@ -1,6 +1,6 @@
-# RME-BabyFace-Pro-FS-Mixer-Patch
+# RME Babyface Pro Patch for ALSA Mixer
 
-The Babyface Pro Fs features a DSP allowing to do quite a bit of routing. This patch exposes the different routing junctions to alsa mixer, hopefully motivating people to create a nice little GUI. ;)
+The Babyface Pro and its FS-successor feature a DSP allowing to do quite a bit of routing. This patch exposes the different routing junctions to alsa mixer, hopefully motivating people to create a nice little GUI. ;)
 
 Thanks RME for your support!
 
