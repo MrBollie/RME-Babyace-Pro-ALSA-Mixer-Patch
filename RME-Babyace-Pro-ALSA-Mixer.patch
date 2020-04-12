@@ -1,3 +1,10 @@
+[PATCH] Added support for the routing-DSP of the RME Babyface Pro FS.
+
+Added support for the routing matrix in the device.
+
+Signed-off-by: Thomas Ebeling <penguins@bollie.de>
+
+---
 diff --git a/sound/usb/mixer_quirks.c b/sound/usb/mixer_quirks.c
 index 02b036b2aefb..05d4f7b7e12d 100644
 --- a/sound/usb/mixer_quirks.c

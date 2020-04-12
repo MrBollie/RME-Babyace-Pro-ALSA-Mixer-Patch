@@ -5,7 +5,7 @@ The Babyface Pro and its FS-successor feature a DSP allowing to do quite a bit o
 Thanks RME for your support!
 
 ## Applying the patch
-Patch with `patch --strip=1 < RME-Babyface-Pro-FS.patch` against your kernel sources.
+Patch with `patch --strip=1 < RME-Babyace-Pro-ALSA-Mixer.patch` against your kernel sources.
 
 Don't forget to activate the corresponding module in your config
 `make M=sound/usb`
