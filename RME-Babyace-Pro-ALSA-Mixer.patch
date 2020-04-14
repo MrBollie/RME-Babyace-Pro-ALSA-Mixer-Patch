@@ -5,14 +5,14 @@ RME Babyface Pro and its successor Babyface Pro FS.
 
 Signed-off-by: Thomas Ebeling <penguins@bollie.de>
 ---
- sound/usb/mixer_quirks.c | 395 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 395 insertions(+)
+ sound/usb/mixer_quirks.c | 418 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 418 insertions(+)
 
 diff --git a/sound/usb/mixer_quirks.c b/sound/usb/mixer_quirks.c
-index 02b036b2aefb..9dd336d735fc 100644
+index 02b036b2aefb..f0302ad7f5a0 100644
 --- a/sound/usb/mixer_quirks.c
 +++ b/sound/usb/mixer_quirks.c
-@@ -2181,6 +2181,398 @@ static int snd_rme_controls_create(struct usb_mixer_interface *mixer)
+@@ -2181,6 +2181,421 @@ static int snd_rme_controls_create(struct usb_mixer_interface *mixer)
  	return 0;
  }
  
@@ -40,16 +40,18 @@ index 02b036b2aefb..9dd336d735fc 100644
 +#define SND_BBFPRO_CTL_REG1_SPDIF_PRO 7
 +#define SND_BBFPRO_CTL_REG1_SPDIF_EMPH 8
 +#define SND_BBFPRO_CTL_REG1_SPDIF_OPTICAL 10
-+#define SND_BBFPRO_CTL_REG2_48V_MIC1 0
-+#define SND_BBFPRO_CTL_REG2_48V_MIC2 1
-+#define SND_BBFPRO_CTL_REG2_INST_GAIN2 2
-+#define SND_BBFPRO_CTL_REG2_INST_GAIN1 3
-+#define SND_BBFPRO_CTL_REG2_PAD_RLY1 4
-+#define SND_BBFPRO_CTL_REG2_PAD_RLY2 5
++#define SND_BBFPRO_CTL_REG2_48V_AN1 0
++#define SND_BBFPRO_CTL_REG2_48V_AN2 1
++#define SND_BBFPRO_CTL_REG2_SENS_IN3 2
++#define SND_BBFPRO_CTL_REG2_SENS_IN4 3
++#define SND_BBFPRO_CTL_REG2_PAD_AN1 4
++#define SND_BBFPRO_CTL_REG2_PAD_AN2 5
 +
 +#define SND_BBFPRO_MIXER_IDX_MASK 0x1ff
 +#define SND_BBFPRO_MIXER_VAL_MASK 0x3ffff
 +#define SND_BBFPRO_MIXER_VAL_SHIFT 9
++#define SND_BBFPRO_MIXER_VAL_MIN 0 // -inf
++#define SND_BBFPRO_MIXER_VAL_MAX 46341 // +6dB
 +
 +#define SND_BBFPRO_USBREQ_CTL_REG1 0x10
 +#define SND_BBFPRO_USBREQ_CTL_REG2 0x17
@@ -101,8 +103,11 @@ index 02b036b2aefb..9dd336d735fc 100644
 +	idx = (pv >> SND_BBFPRO_CTL_IDX_SHIFT) & SND_BBFPRO_CTL_IDX_MASK;
 +	val = kcontrol->private_value >> SND_BBFPRO_CTL_VAL_SHIFT;
 +
-+	if (reg == SND_BBFPRO_CTL_REG1 &&
-+	    idx == SND_BBFPRO_CTL_REG1_CLK_OPTICAL) {
++	if ((reg == SND_BBFPRO_CTL_REG1 &&
++	     idx == SND_BBFPRO_CTL_REG1_CLK_OPTICAL) ||
++	    (reg == SND_BBFPRO_CTL_REG2 &&
++	    (idx == SND_BBFPRO_CTL_REG2_SENS_IN3 ||
++	     idx == SND_BBFPRO_CTL_REG2_SENS_IN4))) {
 +		ucontrol->value.enumerated.item[0] = val;
 +	} else {
 +		ucontrol->value.integer.value[0] = val;
@@ -127,6 +132,14 @@ index 02b036b2aefb..9dd336d735fc 100644
 +			"Internal"
 +		};
 +		return snd_ctl_enum_info(uinfo, 1, 2, texts);
++	} else if (reg == SND_BBFPRO_CTL_REG2 &&
++		   (idx == SND_BBFPRO_CTL_REG2_SENS_IN3 ||
++		    idx == SND_BBFPRO_CTL_REG2_SENS_IN4)) {
++		static const char * const texts[2] = {
++			"-10dBV",
++			"+4dBu"
++		};
++		return snd_ctl_enum_info(uinfo, 1, 2, texts);
 +	}
 +
 +	uinfo->count = 1;
@@ -141,16 +154,25 @@ index 02b036b2aefb..9dd336d735fc 100644
 +{
 +	int err;
 +	u8 reg, idx;
-+	int old_value, pv;
++	int old_value, pv, val;
 +
 +	struct usb_mixer_elem_list *list = snd_kcontrol_chip(kcontrol);
 +	struct usb_mixer_interface *mixer = list->mixer;
-+	int val = ucontrol->value.integer.value[0];
 +
 +	pv = kcontrol->private_value;
 +	reg = pv & SND_BBFPRO_CTL_REG_MASK;
 +	idx = (pv >> SND_BBFPRO_CTL_IDX_SHIFT) & SND_BBFPRO_CTL_IDX_MASK;
 +	old_value = (pv >> SND_BBFPRO_CTL_VAL_SHIFT) & SND_BBFPRO_CTL_VAL_MASK;
++
++	if ((reg == SND_BBFPRO_CTL_REG1 &&
++	     idx == SND_BBFPRO_CTL_REG1_CLK_OPTICAL) ||
++	    (reg == SND_BBFPRO_CTL_REG2 &&
++	    (idx == SND_BBFPRO_CTL_REG2_SENS_IN3 ||
++	     idx == SND_BBFPRO_CTL_REG2_SENS_IN4))) {
++		val = ucontrol->value.enumerated.item[0];
++	} else {
++		val = ucontrol->value.integer.value[0];
++	}
 +
 +	if (val > 1)
 +		return -EINVAL;
@@ -222,8 +244,8 @@ index 02b036b2aefb..9dd336d735fc 100644
 +{
 +	uinfo->type = SNDRV_CTL_ELEM_TYPE_INTEGER;
 +	uinfo->count = 1;
-+	uinfo->value.integer.min = 0;
-+	uinfo->value.integer.max = 46341;
++	uinfo->value.integer.min = SND_BBFPRO_MIXER_VAL_MIN;
++	uinfo->value.integer.max = SND_BBFPRO_MIXER_VAL_MAX;
 +	return 0;
 +}
 +
@@ -240,7 +262,7 @@ index 02b036b2aefb..9dd336d735fc 100644
 +	idx = kcontrol->private_value & SND_BBFPRO_MIXER_IDX_MASK;
 +	old_value = kcontrol->private_value >> SND_BBFPRO_MIXER_VAL_SHIFT;
 +
-+	if (uvalue > 46341)
++	if (uvalue > SND_BBFPRO_MIXER_VAL_MAX)
 +		return -EINVAL;
 +
 +	if (uvalue == old_value)
@@ -315,7 +337,7 @@ index 02b036b2aefb..9dd336d735fc 100644
 +	char name[48];
 +
 +	static const char * const input[] = {
-+		"AN1", "AN2", "Instr.3", "Instr.4", "AS1", "AS2", "ADAT3",
++		"AN1", "AN2", "IN3", "IN4", "AS1", "AS2", "ADAT3",
 +		"ADAT4", "ADAT5", "ADAT6", "ADAT7", "ADAT8"};
 +
 +	static const char * const output[] = {
@@ -326,7 +348,8 @@ index 02b036b2aefb..9dd336d735fc 100644
 +		for (i = 0 ; i < 12 ; ++i) {
 +			// Line routing
 +			snprintf(name, sizeof(name),
-+				 "Line-%s-%s Playback Volume",
++				 "%s-%s-%s Playback Volume",
++				 (i < 2 ? "Mic" : "Line"),
 +				 input[i], output[o]);
 +			err = snd_bbfpro_vol_add(mixer, (26 * o + i), name);
 +			if (err < 0)
@@ -370,38 +393,38 @@ index 02b036b2aefb..9dd336d735fc 100644
 +
 +	// Control Reg 2
 +	err = snd_bbfpro_ctl_add(mixer, SND_BBFPRO_CTL_REG2,
-+				 SND_BBFPRO_CTL_REG2_48V_MIC1,
-+				 "Mic1 48V");
++				 SND_BBFPRO_CTL_REG2_48V_AN1,
++				 "Mic-AN1 48V");
 +	if (err < 0)
 +		return err;
 +
 +	err = snd_bbfpro_ctl_add(mixer, SND_BBFPRO_CTL_REG2,
-+				 SND_BBFPRO_CTL_REG2_48V_MIC2,
-+				 "Mic2 48V");
++				 SND_BBFPRO_CTL_REG2_48V_AN2,
++				 "Mic-AN2 48V");
 +	if (err < 0)
 +		return err;
 +
 +	err = snd_bbfpro_ctl_add(mixer, SND_BBFPRO_CTL_REG2,
-+				 SND_BBFPRO_CTL_REG2_INST_GAIN1,
-+				 "Instr. Gain 1");
++				 SND_BBFPRO_CTL_REG2_SENS_IN3,
++				 "Line-IN3 Sens.");
 +	if (err < 0)
 +		return err;
 +
 +	err = snd_bbfpro_ctl_add(mixer, SND_BBFPRO_CTL_REG2,
-+				 SND_BBFPRO_CTL_REG2_INST_GAIN2,
-+				 "Instr. Gain 2");
++				 SND_BBFPRO_CTL_REG2_SENS_IN4,
++				 "Line-IN4 Sens.");
 +	if (err < 0)
 +		return err;
 +
 +	err = snd_bbfpro_ctl_add(mixer, SND_BBFPRO_CTL_REG2,
-+				 SND_BBFPRO_CTL_REG2_PAD_RLY1,
-+				 "Mic1 PAD");
++				 SND_BBFPRO_CTL_REG2_PAD_AN1,
++				 "Mic-AN1 PAD");
 +	if (err < 0)
 +		return err;
 +
 +	err = snd_bbfpro_ctl_add(mixer, SND_BBFPRO_CTL_REG2,
-+				 SND_BBFPRO_CTL_REG2_PAD_RLY2,
-+				 "Mic2 PAD");
++				 SND_BBFPRO_CTL_REG2_PAD_AN2,
++				 "Mic-AN2 PAD");
 +	if (err < 0)
 +		return err;
 +
@@ -411,7 +434,7 @@ index 02b036b2aefb..9dd336d735fc 100644
  int snd_usb_mixer_apply_create_quirk(struct usb_mixer_interface *mixer)
  {
  	int err = 0;
-@@ -2282,6 +2674,9 @@ int snd_usb_mixer_apply_create_quirk(struct usb_mixer_interface *mixer)
+@@ -2282,6 +2697,9 @@ int snd_usb_mixer_apply_create_quirk(struct usb_mixer_interface *mixer)
  	case USB_ID(0x0194f, 0x010c): /* Presonus Studio 1810c */
  		err = snd_sc1810_init_mixer(mixer);
  		break;
