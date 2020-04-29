@@ -19,3 +19,7 @@ I might rename the volume controls before I get to submit this patch officially.
 Exposing so many controls will cause inconvenience when using standard mixer apps like alsamixer. Therefore, a custom mixer GUI is probably the best way to go. I'm currently working on a very basic one, you will find here: https://github.com/MrBollie/bbfpromix 
 
 Of course, feel free to code your own, probably way more sophisticated one. :)
+
+___
+
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I61NTVW)
