@@ -5,14 +5,14 @@ The Babyface Pro and its FS-successor feature a DSP allowing to do quite a bit o
 Thanks RME for your support!
 
 ## Applying the patch
+This patch has been [merged to upstream Linux](https://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound.git/commit/?h=for-next&id=3e8f3bd047163d30fb1ad32ca7e4628921555c09) for Linux 5.8. If your distribution does not yet package Linux 5.8, you can apply this patch to your distribution's kernel sources. Consult your distribution's documentation details about how to build your own kernel.
+
 Patch with `patch --strip=1 < RME-Babyace-Pro-ALSA-Mixer.patch` against your kernel sources.
 
 Don't forget to activate the corresponding module in your config
 `make M=sound/usb`
 
 Feedback is always welcome and please use with caution! I've tested it quite a bit, but you'll never now. ;)
-
-I might rename the volume controls before I get to submit this patch officially.
 
 ## Using a Mixer GUI
 
