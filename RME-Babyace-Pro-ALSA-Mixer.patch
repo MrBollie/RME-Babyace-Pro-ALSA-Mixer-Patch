@@ -9,7 +9,7 @@ Signed-off-by: Thomas Ebeling <penguins@bollie.de>
  1 file changed, 418 insertions(+)
 
 diff --git a/sound/usb/mixer_quirks.c b/sound/usb/mixer_quirks.c
-index a5f65a9a0254..d15f5d10ce1c 100644
+index a5f65a9a0254..aad2683ff793 100644
 --- a/sound/usb/mixer_quirks.c
 +++ b/sound/usb/mixer_quirks.c
 @@ -2185,6 +2185,421 @@ static int snd_rme_controls_create(struct usb_mixer_interface *mixer)
@@ -22,7 +22,7 @@ index a5f65a9a0254..d15f5d10ce1c 100644
 + * These devices exposes a couple of DSP functions via request to EP0.
 + * Switches are available via control registers, while routing is controlled
 + * by controlling the volume on each possible crossing point.
-+ * Volume control is linear, from -inf (dec. 0) to +6dB (dec. 46341) with
++ * Volume control is linear, from -inf (dec. 0) to +6dB (dec. 65536) with
 + * 0dB being at dec. 32768.
 + */
 +enum {
