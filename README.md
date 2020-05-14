@@ -20,6 +20,20 @@ Exposing so many controls will cause inconvenience when using standard mixer app
 
 Of course, feel free to code your own, probably way more sophisticated one. :)
 
+## What this patch offers
+
+- Access to the BBF Pro's internal mixer DSP to set level of individual routing crosspoints via alsa mixer
+- Access to control registers to set SPDIF and clock master flags.
+
+## What this patch doesn't offer
+
+- Reading the current status from the device
+- Exposing any level meters
+- Access to EQ
+- FX (those aren't really part of the DSP anyway)
+
+The reason for these missing features is, that I wasn't provided with any USB control endpoint requests that would allow access to that. Please refrain from asking about features TotalMix on the iPad offers, that aren't available here, since it's done in a completely different way, that wouldn't belong into alsa mixer anyway.
+
 ___
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I61NTVW)
