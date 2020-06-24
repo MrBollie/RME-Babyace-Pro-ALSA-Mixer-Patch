@@ -1,4 +1,4 @@
-Subject: [PATCH] [PATCH v3] RME Babyface Pro mixer patch: Fixing usage of NULL
+[PATCH v3] RME Babyface Pro mixer patch: Fixing usage of NULL
 
 Added mixer quirks to allow controlling the internal DSP of the
 RME Babyface Pro and its successor Babyface Pro FS.
