@@ -30,6 +30,7 @@ Of course, feel free to code your own, probably way more sophisticated one. :)
 - Reading the current status from the device
 - Exposing any level meters
 - Access to EQ
+- Access to preamp gain
 - FX (those aren't really part of the DSP anyway)
 
 The reason for these missing features is, that I wasn't provided with any USB control endpoint requests that would allow access to that. Please refrain from asking about features TotalMix on the iPad offers, that aren't available here, since it's done in a completely different way, that wouldn't belong into alsa mixer anyway.
