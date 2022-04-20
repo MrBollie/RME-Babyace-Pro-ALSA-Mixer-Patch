@@ -5,6 +5,9 @@ The Babyface Pro and its FS-successor feature a DSP allowing to do quite a bit o
 Thanks RME for your support!
 
 ## Applying the patch
+
+*As this has been part of the mainline kernel since 2020, this shouldn't been needed anymore.*
+
 Patch with `patch --strip=1 < RME-Babyace-Pro-ALSA-Mixer.patch` against your kernel sources.
 
 Don't forget to activate the corresponding module in your config
@@ -35,6 +38,3 @@ Of course, feel free to code your own, probably way more sophisticated one. :)
 
 The reason for these missing features is, that I wasn't provided with any USB control endpoint requests that would allow access to that. Please refrain from asking about features TotalMix on the iPad offers, that aren't available here, since it's done in a completely different way, that wouldn't belong into alsa mixer anyway.
 
-___
-
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I61NTVW)
