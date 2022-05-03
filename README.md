@@ -1,6 +1,6 @@
 # RME Babyface Pro Patch for ALSA Mixer
 
-**Important:** Project will be archived soon, as the code has been part of the mainline kernel since 2020 and I'm no longer maintaining it
+## Project has been archived, as I now longer own the BabyFace Pro FS and the patch has been part of the mainline kernel for almost two years, now.
 
 The Babyface Pro and its FS-successor feature a DSP allowing to do quite a bit of routing. This patch exposes the different routing junctions to alsa mixer, hopefully motivating people to create a nice little GUI. ;)
 
